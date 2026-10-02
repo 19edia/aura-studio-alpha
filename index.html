@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0d12" />
+  <meta name="description" content="AURA Wallpaper Studio — ferramenta portátil para trocar o wallpaper no Windows sem depender do menu de Personalização." />
+  <title>AURA Wallpaper Studio</title>
+
+  <style>
+    :root{
+      --bg:#080a0f;
+      --bg2:#0d1119;
+      --card:rgba(255,255,255,.055);
+      --card2:rgba(255,255,255,.085);
+      --line:rgba(255,255,255,.10);
+      --text:#f5f7fb;
+      --muted:#a7afbf;
+      --purple:#8b5cf6;
+      --blue:#3b82f6;
+      --cyan:#22d3ee;
+      --green:#22c55e;
+      --shadow:0 30px 80px rgba(0,0,0,.45);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--text);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(139,92,246,.18), transparent 34rem),
+        radial-gradient(circle at 85% 8%, rgba(34,211,238,.12), transparent 30rem),
+        linear-gradient(180deg, #090b10 0%, #07090d 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:linear-gradient(to bottom, rgba(0,0,0,.65), transparent 85%);
+      z-index:-1;
+    }
+
+    a{color:inherit;text-decoration:none}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(1180px, calc(100% - 32px));margin:auto}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(8,10,15,.66);
+      border-bottom:1px solid rgba(255,255,255,.07);
+    }
+
+    .nav{
+      height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:850;
+      letter-spacing:-.02em;
+    }
+
+    .logo{
+      width:38px;
+      height:38px;
+      border-radius:13px;
+      display:grid;
+      place-items:center;
+      background:
+        linear-gradient(135deg, rgba(139,92,246,.95), rgba(59,130,246,.95));
+      box-shadow:0 10px 30px rgba(99,102,241,.35);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .logo::after{
+      content:"A";
+      font-weight:900;
+      font-size:20px;
+      transform:skewX(-8deg);
+    }
+
+    .navlinks{
+      display:flex;
+      gap:24px;
+      color:var(--muted);
+      font-size:14px;
+      font-weight:650;
+    }
+
+    .navlinks a:hover{color:white}
+
+    .nav-cta{
+      padding:10px 15px;
+      border-radius:12px;
+      background:white;
+      color:#080a0f;
+      font-size:14px;
+      font-weight:800;
+      transition:.2s ease;
+    }
+
+    .nav-cta:hover{transform:translateY(-2px)}
+
+    .hero{
+      padding:96px 0 64px;
+      display:grid;
+      grid-template-columns:1.03fr .97fr;
+      gap:64px;
+      align-items:center;
+      min-height:calc(100vh - 72px);
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      padding:8px 11px;
+      border:1px solid rgba(255,255,255,.11);
+      background:rgba(255,255,255,.05);
+      border-radius:999px;
+      color:#dbe2f0;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .dot{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--green);
+      box-shadow:0 0 14px rgba(34,197,94,.9);
+    }
+
+    h1{
+      margin:24px 0 20px;
+      font-size:clamp(48px, 6vw, 86px);
+      line-height:.95;
+      letter-spacing:-.055em;
+    }
+
+    .gradient-text{
+      background:linear-gradient(100deg,#fff 10%,#bda8ff 47%,#61dff1 92%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .lead{
+      color:var(--muted);
+      font-size:clamp(17px,2vw,20px);
+      line-height:1.7;
+      max-width:700px;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:30px;
+    }
+
+    .btn{
+      border:0;
+      border-radius:15px;
+      padding:14px 18px;
+      font-weight:850;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition:.22s ease;
+    }
+
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(135deg,var(--purple),var(--blue));
+      box-shadow:0 16px 42px rgba(79,70,229,.34);
+    }
+
+    .btn-primary:hover{transform:translateY(-2px) scale(1.01)}
+
+    .btn-secondary{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color:#e8edf7;
+    }
+
+    .btn-secondary:hover{background:rgba(255,255,255,.10)}
+
+    .micro{
+      margin-top:15px;
+      color:#7f899a;
+      font-size:13px;
+    }
+
+    .chips{
+      margin-top:30px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .chip{
+      border:1px solid rgba(255,255,255,.09);
+      background:rgba(255,255,255,.035);
+      padding:9px 12px;
+      border-radius:999px;
+      font-size:13px;
+      color:#c9d1df;
+    }
+
+    .window{
+      border:1px solid rgba(255,255,255,.13);
+      background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      transform:perspective(1100px) rotateY(-3deg) rotateX(1.5deg);
+      transition:.35s ease;
+    }
+
+    .window:hover{transform:perspective(1100px) rotateY(0) rotateX(0) translateY(-4px)}
+
+    .windowbar{
+      height:48px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:0 18px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.025);
+    }
+
+    .ball{width:10px;height:10px;border-radius:50%;background:#2c3340}
+    .ball:nth-child(1){background:#ff5f57}
+    .ball:nth-child(2){background:#febc2e}
+    .ball:nth-child(3){background:#28c840}
+    .windowtitle{margin-left:8px;color:#8f98a8;font-size:12px}
+
+    .app{
+      padding:22px;
+      min-height:490px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      background:
+        radial-gradient(circle at 90% 0%,rgba(59,130,246,.11),transparent 16rem),
+        #0b0f16;
+    }
+
+    .apphead{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .appname{font-size:15px;font-weight:850}
+    .status{
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(34,197,94,.1);
+      color:#8ff0b3;
+      border:1px solid rgba(34,197,94,.2);
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .dropzone{
+      flex:1;
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:21px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:25px;
+      background:
+        linear-gradient(135deg,rgba(139,92,246,.05),rgba(34,211,238,.035));
+      position:relative;
+      overflow:hidden;
+    }
+
+    .preview{
+      width:100%;
+      height:230px;
+      border-radius:17px;
+      background:
+        radial-gradient(circle at 35% 40%, rgba(255,255,255,.12), transparent 8rem),
+        linear-gradient(135deg,#151b27,#12111f 45%,#151b27);
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .preview::before{
+      content:"AURA";
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      font-size:clamp(38px,7vw,72px);
+      letter-spacing:.22em;
+      padding-left:.22em;
+      font-weight:950;
+      color:rgba(255,255,255,.08);
+    }
+
+    .preview::after{
+      content:"";
+      position:absolute;
+      inset:-30%;
+      background:conic-gradient(from 90deg,transparent,rgba(139,92,246,.2),transparent,rgba(34,211,238,.14),transparent);
+      animation:spin 12s linear infinite;
+    }
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .resolution{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+    }
+
+    .res-btn{
+      border:1px solid rgba(255,255,255,.09);
+      background:#10151e;
+      color:#aeb7c8;
+      border-radius:12px;
+      padding:10px 8px;
+      font-size:12px;
+      font-weight:750;
+    }
+
+    .res-btn.active{
+      color:white;
+      background:linear-gradient(135deg,rgba(139,92,246,.35),rgba(59,130,246,.26));
+      border-color:rgba(139,92,246,.48);
+    }
+
+    .apply{
+      border:0;
+      border-radius:14px;
+      padding:13px;
+      color:white;
+      font-weight:850;
+      background:linear-gradient(135deg,#6d4cf6,#3b82f6);
+    }
+
+    section{padding:92px 0}
+    .section-title{
+      text-align:center;
+      max-width:780px;
+      margin:0 auto 44px;
+    }
+
+    .kicker{
+      text-transform:uppercase;
+      letter-spacing:.15em;
+      color:#9d8df4;
+      font-weight:850;
+      font-size:12px;
+    }
+
+    h2{
+      font-size:clamp(34px,5vw,56px);
+      line-height:1.05;
+      letter-spacing:-.04em;
+      margin:12px 0 14px;
+    }
+
+    .section-title p{
+      color:var(--muted);
+      font-size:17px;
+      line-height:1.7;
+    }
+
+    .grid3{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      background:var(--card);
+      border-radius:22px;
+      padding:24px;
+      min-height:230px;
+      transition:.25s ease;
+    }
+
+    .card:hover{
+      transform:translateY(-5px);
+      background:var(--card2);
+      border-color:rgba(255,255,255,.16);
+    }
+
+    .icon{
+      width:44px;height:44px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(59,130,246,.16));
+      border:1px solid rgba(139,92,246,.22);
+      font-size:20px;
+      margin-bottom:20px;
+    }
+
+    .card h3{margin:0 0 10px;font-size:19px}
+    .card p{color:var(--muted);line-height:1.65;margin:0}
+
+    .security{
+      display:grid;
+      grid-template-columns:.92fr 1.08fr;
+      gap:24px;
+      align-items:stretch;
+    }
+
+    .security-panel{
+      border:1px solid var(--line);
+      border-radius:26px;
+      background:var(--card);
+      padding:30px;
+    }
+
+    .checks{
+      display:grid;
+      gap:13px;
+      margin-top:24px;
+    }
+
+    .check{
+      display:flex;
+      align-items:flex-start;
+      gap:11px;
+      color:#dce2ee;
+    }
+
+    .check i{
+      font-style:normal;
+      color:#80e7a4;
+      margin-top:1px;
+      font-weight:900;
+    }
+
+    .code{
+      background:#080b10;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:inset 0 1px rgba(255,255,255,.02);
+    }
+
+    .codebar{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      color:#8993a4;
+      font-size:12px;
+    }
+
+    pre{
+      margin:0;
+      padding:20px;
+      overflow:auto;
+      color:#cbd5e1;
+      font:13px/1.7 "Cascadia Code","SFMono-Regular",Consolas,monospace;
+    }
+
+    .purple{color:#c4b5fd}
+    .cyan{color:#67e8f9}
+    .green{color:#86efac}
+
+    .steps{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      counter-reset:step;
+    }
+
+    .step{
+      counter-increment:step;
+      border:1px solid var(--line);
+      background:var(--card);
+      border-radius:20px;
+      padding:23px;
+      position:relative;
+    }
+
+    .step::before{
+      content:counter(step);
+      width:32px;height:32px;
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      background:rgba(139,92,246,.17);
+      border:1px solid rgba(139,92,246,.24);
+      color:#c4b5fd;
+      font-weight:900;
+      margin-bottom:18px;
+    }
+
+    .step h3{font-size:17px;margin:0 0 8px}
+    .step p{margin:0;color:var(--muted);line-height:1.6;font-size:14px}
+
+    .tabs{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .tab{
+      border:1px solid rgba(255,255,255,.09);
+      background:rgba(255,255,255,.04);
+      color:#aeb7c8;
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:800;
+      font-size:13px;
+    }
+
+    .tab.active{
+      color:white;
+      background:rgba(139,92,246,.17);
+      border-color:rgba(139,92,246,.35);
+    }
+
+    .tab-content{
+      display:none;
+      border:1px solid var(--line);
+      background:var(--card);
+      border-radius:24px;
+      padding:28px;
+      min-height:220px;
+    }
+
+    .tab-content.active{display:block}
+    .tab-content h3{margin-top:0;font-size:25px}
+    .tab-content p{color:var(--muted);line-height:1.75}
+
+    .faq{
+      max-width:860px;
+      margin:auto;
+      display:grid;
+      gap:10px;
+    }
+
+    .faq-item{
+      border:1px solid var(--line);
+      border-radius:17px;
+      overflow:hidden;
+      background:rgba(255,255,255,.035);
+    }
+
+    .faq-q{
+      width:100%;
+      border:0;
+      color:white;
+      background:transparent;
+      display:flex;
+      justify-content:space-between;
+      gap:20px;
+      text-align:left;
+      padding:18px 20px;
+      font-weight:820;
+    }
+
+    .faq-a{
+      max-height:0;
+      overflow:hidden;
+      transition:max-height .28s ease;
+      color:var(--muted);
+    }
+
+    .faq-a > div{
+      padding:0 20px 19px;
+      line-height:1.7;
+    }
+
+    .faq-item.open .faq-a{max-height:220px}
+    .faq-plus{transition:.2s ease}
+    .faq-item.open .faq-plus{transform:rotate(45deg)}
+
+    .download{
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(circle at 20% 0%,rgba(139,92,246,.22),transparent 26rem),
+        radial-gradient(circle at 90% 50%,rgba(34,211,238,.12),transparent 22rem),
+        rgba(255,255,255,.04);
+      border-radius:30px;
+      padding:44px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:30px;
+      box-shadow:var(--shadow);
+    }
+
+    .download h2{font-size:clamp(32px,4vw,50px);margin:0 0 13px}
+    .download p{color:var(--muted);max-width:660px;line-height:1.7;margin:0}
+    .download .btn{white-space:nowrap}
+
+    footer{
+      padding:34px 0 46px;
+      color:#7f8998;
+      font-size:13px;
+    }
+
+    .foot{
+      display:flex;
+      justify-content:space-between;
+      gap:20px;
+      border-top:1px solid rgba(255,255,255,.07);
+      padding-top:26px;
+      flex-wrap:wrap;
+    }
+
+    .notice{
+      margin-top:18px;
+      padding:14px 16px;
+      border-radius:14px;
+      border:1px solid rgba(245,158,11,.18);
+      background:rgba(245,158,11,.055);
+      color:#d6c49a;
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    @media (max-width: 920px){
+      .hero,.security{grid-template-columns:1fr}
+      .hero{padding-top:70px}
+      .window{transform:none}
+      .grid3{grid-template-columns:1fr}
+      .steps{grid-template-columns:1fr 1fr}
+      .navlinks{display:none}
+    }
+
+    @media (max-width: 620px){
+      .wrap{width:min(100% - 22px,1180px)}
+      .hero{padding:52px 0}
+      .steps{grid-template-columns:1fr}
+      .resolution{grid-template-columns:1fr 1fr}
+      .download{padding:28px;align-items:flex-start;flex-direction:column}
+      .nav-cta{display:none}
+      h1{font-size:48px}
+      section{padding:70px 0}
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="wrap nav">
+      <a class="brand" href="#top">
+        <span class="logo"></span>
+        <span>AURA Wallpaper Studio</span>
+      </a>
+
+      <nav class="navlinks">
+        <a href="#recursos">Recursos</a>
+        <a href="#seguranca">Segurança</a>
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <a class="nav-cta" href="./Wallpaper_Aura.bat" download>Baixar</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="wrap hero">
+      <section style="padding:0">
+        <span class="eyebrow"><span class="dot"></span> Portátil • Open source • Sem instalação</span>
+
+        <h1>
+          Seu wallpaper.<br>
+          <span class="gradient-text">Sem complicação.</span>
+        </h1>
+
+        <p class="lead">
+          O AURA Wallpaper Studio é uma ferramenta portátil para Windows que permite aplicar wallpapers
+          mesmo quando o menu de Personalização está limitado. Um único arquivo, interface simples e nada de
+          editar Registro manualmente.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="./Wallpaper_Aura.bat" download>
+            ↓ Baixar Wallpaper_Aura.bat
+          </a>
+          <a class="btn btn-secondary" href="#como-funciona">Ver como funciona</a>
+        </div>
+
+        <p class="micro">
+          Não ativa o Windows, não altera licença e não precisa de privilégios de administrador.
+        </p>
+
+        <div class="chips">
+          <span class="chip">Windows 10 / 11</span>
+          <span class="chip">JPG • PNG • BMP</span>
+          <span class="chip">Full HD • 4K • 8K</span>
+          <span class="chip">1 arquivo</span>
+          <span class="chip">100% open source</span>
+        </div>
+      </section>
+
+      <aside class="window" aria-label="Prévia do AURA Wallpaper Studio">
+        <div class="windowbar">
+          <span class="ball"></span><span class="ball"></span><span class="ball"></span>
+          <span class="windowtitle">AURA Wallpaper Studio</span>
+        </div>
+
+        <div class="app">
+          <div class="apphead">
+            <div class="appname">AURA Wallpaper</div>
+            <span class="status">● pronto</span>
+          </div>
+
+          <div class="dropzone">
+            <div style="width:100%">
+              <div class="preview"></div>
+              <p style="color:#aeb7c8;margin:14px 0 2px;font-size:13px">
+                Solte uma imagem aqui ou escolha um arquivo
+              </p>
+            </div>
+          </div>
+
+          <div class="resolution" id="resolutionDemo">
+            <button class="res-btn active">Original</button>
+            <button class="res-btn">Full HD</button>
+            <button class="res-btn">4K</button>
+            <button class="res-btn">8K</button>
+          </div>
+
+          <button class="apply" id="demoApply">Aplicar wallpaper</button>
+        </div>
+      </aside>
+    </div>
+
+    <section id="recursos">
+      <div class="wrap">
+        <div class="section-title">
+          <div class="kicker">Apresentação</div>
+          <h2>Uma ideia simples, transformada em ferramenta de verdade.</h2>
+          <p>
+            O objetivo é eliminar aquela peregrinação ridícula por menus, tutoriais e comandos só para trocar
+            uma imagem de fundo. Humanos realmente conseguiram burocratizar até o wallpaper.
+          </p>
+        </div>
+
+        <div class="grid3">
+          <article class="card">
+            <div class="icon">⚡</div>
+            <h3>Portátil</h3>
+            <p>O programa inteiro fica em um único arquivo <strong>Wallpaper_Aura.bat</strong>. Sem instalador e sem pasta obrigatória.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">🖼</div>
+            <h3>Redimensionamento</h3>
+            <p>Mantenha a resolução original ou converta a imagem para Full HD, 4K ou 8K antes de aplicar.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">🪟</div>
+            <h3>Usa o próprio Windows</h3>
+            <p>O AURA usa PowerShell, WPF, System.Drawing e a API nativa de wallpaper do Windows.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">⌨</div>
+            <h3>Open source</h3>
+            <p>Todo o código-fonte fica disponível no repositório. Qualquer pessoa pode abrir, estudar, auditar, modificar e contribuir com o projeto conforme a licença escolhida.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="seguranca">
+      <div class="wrap">
+        <div class="section-title">
+          <div class="kicker">Transparência & Open Source</div>
+          <h2>“É vírus?” A pergunta inevitável.</h2>
+          <p>
+            É um arquivo BAT que abre PowerShell, então alguma desconfiança é saudável. O AURA é <strong>open source</strong>:
+            o código-fonte fica disponível publicamente no repositório e pode ser aberto, estudado e auditado por qualquer pessoa.
+          </p>
+        </div>
+
+        <div class="security">
+          <div class="security-panel">
+            <h3 style="font-size:26px;margin:0">O que o projeto não precisa fazer</h3>
+
+            <div class="checks">
+              <div class="check"><i>✓</i><span>Não baixa componentes externos da internet.</span></div>
+              <div class="check"><i>✓</i><span>Não precisa executar como administrador.</span></div>
+              <div class="check"><i>✓</i><span>Não ativa o Windows e não altera chaves de licença.</span></div>
+              <div class="check"><i>✓</i><span>Não instala serviço, tarefa agendada ou inicialização automática.</span></div>
+              <div class="check"><i>✓</i><span>As alterações do wallpaper ficam no contexto do usuário atual.</span></div>
+            </div>
+
+            <div class="notice">
+              Alguns antivírus ou o SmartScreen podem alertar sobre scripts BAT/PowerShell por heurística ou baixa
+              reputação do arquivo. O aviso deve ser analisado, não ignorado às cegas.
+            </div>
+          </div>
+
+          <div class="security-panel">
+            <div class="code">
+              <div class="codebar">Wallpaper_Aura.bat — estrutura simplificada</div>
+              <pre><span class="purple">@echo off</span>
+<span class="cyan">powershell.exe</span> ...
+
+<span class="green">#==AURA_POWERSHELL==</span>
+
+Add-Type -AssemblyName PresentationFramework
+Add-Type -AssemblyName System.Drawing
+
+# Interface WPF
+# Processamento da imagem
+# Aplicação do wallpaper via user32.dll</pre>
+            </div>
+
+            <p style="color:var(--muted);line-height:1.7;margin:18px 0 0">
+              O BAT funciona como inicializador e carrega o PowerShell embutido no próprio arquivo.
+              É por isso que o programa consegue continuar sendo distribuído como uma peça única.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="como-funciona">
+      <div class="wrap">
+        <div class="section-title">
+          <div class="kicker">Como funciona</div>
+          <h2>Quatro passos. Porque trocar wallpaper não devia parecer manutenção de servidor.</h2>
+        </div>
+
+        <div class="steps">
+          <article class="step">
+            <h3>Abra o AURA</h3>
+            <p>Execute o arquivo <strong>Wallpaper_Aura.bat</strong>.</p>
+          </article>
+
+          <article class="step">
+            <h3>Escolha a imagem</h3>
+            <p>Selecione um JPG, JPEG, PNG ou BMP armazenado no computador.</p>
+          </article>
+
+          <article class="step">
+            <h3>Escolha a resolução</h3>
+            <p>Use a original ou prepare a imagem para Full HD, 4K ou 8K.</p>
+          </article>
+
+          <article class="step">
+            <h3>Aplique</h3>
+            <p>O programa gera o wallpaper e pede ao Windows para aplicá-lo imediatamente.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="apresentacoes">
+      <div class="wrap">
+        <div class="section-title">
+          <div class="kicker">Por dentro</div>
+          <h2>Explore a ideia.</h2>
+          <p>Troque as abas para apresentar rapidamente o projeto para quem cair no repositório.</p>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" data-tab="ideia">A ideia</button>
+          <button class="tab" data-tab="tecnica">Parte técnica</button>
+          <button class="tab" data-tab="limites">O que ele não faz</button>
+        </div>
+
+        <div class="tab-content active" id="tab-ideia">
+          <h3>Uma alternativa ao menu de Personalização</h3>
+          <p>
+            O AURA existe para facilitar a troca de wallpaper quando o usuário não quer ou não consegue usar o
+            caminho tradicional do Windows. Ele não tenta “ativar” nada. Apenas oferece uma interface própria e
+            usa mecanismos que já existem no sistema operacional.
+          </p>
+        </div>
+
+        <div class="tab-content" id="tab-tecnica">
+          <h3>PowerShell + WPF + APIs nativas</h3>
+          <p>
+            A interface é construída com WPF. O processamento e redimensionamento das imagens utiliza
+            System.Drawing. Depois de preparar o arquivo, o programa ajusta as preferências de wallpaper do
+            usuário e usa <strong>SystemParametersInfoW</strong>, em <strong>user32.dll</strong>, para pedir ao
+            Windows que aplique a imagem.
+          </p>
+        </div>
+
+        <div class="tab-content" id="tab-limites">
+          <h3>Não é ativador de Windows</h3>
+          <p>
+            O AURA não fornece licença, não modifica o sistema de ativação e não remove avisos de ativação.
+            A ferramenta se concentra exclusivamente em preparar e aplicar wallpapers. Simples. Milagrosamente,
+            um projeto com escopo definido.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="wrap">
+        <div class="section-title">
+          <div class="kicker">FAQ</div>
+          <h2>Perguntas comuns</h2>
+        </div>
+
+        <div class="faq">
+          <div class="faq-item">
+            <button class="faq-q">Precisa instalar alguma coisa?<span class="faq-plus">+</span></button>
+            <div class="faq-a"><div>Não. O AURA foi criado para funcionar como um único arquivo portátil.</div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">Ele ativa o Windows?<span class="faq-plus">+</span></button>
+            <div class="faq-a"><div>Não. O programa não altera licença, chave de produto ou estado de ativação.</div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">Precisa de administrador?<span class="faq-plus">+</span></button>
+            <div class="faq-a"><div>Não. O fluxo normal trabalha com configurações do usuário atual.</div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">Por que um antivírus pode mostrar aviso?<span class="faq-plus">+</span></button>
+            <div class="faq-a"><div>BATs que iniciam PowerShell podem receber alertas por heurística. O código-fonte aberto permite verificar o comportamento antes de executar.</div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">Onde o AURA guarda os wallpapers processados?<span class="faq-plus">+</span></button>
+            <div class="faq-a"><div>Na pasta <strong>%LocalAppData%\AuraWallpaper</strong>, usada como cache local do programa.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="download">
+          <div>
+            <div class="kicker">Download</div>
+            <h2>Baixe e use.</h2>
+            <p>
+              Coloque o <strong>index.html</strong> e o <strong>Wallpaper_Aura.bat</strong> na mesma pasta do seu
+              repositório. O botão ao lado já aponta para o arquivo BAT usando um link relativo.
+            </p>
+          </div>
+
+          <a class="btn btn-primary" href="./Wallpaper_Aura.bat" download>
+            ↓ Baixar AURA
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <span>© <span id="year"></span> AURA Wallpaper Studio</span>
+      <span>Open source • Projeto independente • Não afiliado à Microsoft.</span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    document.querySelectorAll(".res-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".res-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+    });
+
+    const applyBtn = document.getElementById("demoApply");
+    applyBtn.addEventListener("click", () => {
+      const old = applyBtn.textContent;
+      applyBtn.textContent = "✓ Wallpaper aplicado";
+      applyBtn.style.background = "linear-gradient(135deg,#16a34a,#22c55e)";
+      setTimeout(() => {
+        applyBtn.textContent = old;
+        applyBtn.style.background = "";
+      }, 1800);
+    });
+
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+        tab.classList.add("active");
+        document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
+      });
+    });
+
+    document.querySelectorAll(".faq-q").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const item = btn.closest(".faq-item");
+        item.classList.toggle("open");
+      });
+    });
+  </script>
+</body>
+</html>
